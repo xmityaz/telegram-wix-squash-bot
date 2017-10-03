@@ -1,0 +1,23 @@
+{
+  "name": "wix_squash_bot",
+  "version": "0.0.1",
+  "description": "Telegram bot for wix Kiev employees which allows monitor availavle squash courts in Kiev",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wix",
+    "telegram",
+    "bot",
+    "squash"
+  ],
+  "author": "xmityaz",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "jsdom": "^11.3.0",
+    "moment": "^2.18.1",
+    "telegraf": "^3.12.1"
+  }
+}
