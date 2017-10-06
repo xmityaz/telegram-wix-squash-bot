@@ -19,5 +19,10 @@
     "jsdom": "^11.3.0",
     "moment": "^2.18.1",
     "telegraf": "^3.12.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.8.0",
+    "eslint-config-airbnb-base": "^12.0.2",
+    "eslint-plugin-import": "^2.7.0"
   }
 }
