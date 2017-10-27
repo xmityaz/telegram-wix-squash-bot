@@ -13,9 +13,14 @@ const CLUBS = {
     { name: 'Poznyaki', id: 29 },
     { name: 'Kurenyovka', id: 13 },
     { name: 'Mayakovskogo', id: 21 },
-    { name: 'Teremki', id: 32 },
+    { name: 'Teremki', id: 32 }
   ]
 };
+
+function getClubById(clubId) {
+  const resClubs = Object.values(CLUBS).find(clubs => clubs.find(club => club.id === clubId));
+  return resClubs.find(club => club.id === clubId);
+}
 
 function generateUrl(date, clubId, cityId) {
   const SPORT_LIFE_TABLE_URL = 'http://squasharena.com.ua/get-courts-data-table.php';
@@ -51,7 +56,7 @@ function printAvailabilityTable(availabilityMap) {
   }, '');
 }
 
-function convertHtmlResponse(innerHtml, date) {
+function convertHtmlResponse(innerHtml, date, courtName) {
   const { document } = new JSDOM(`<!DOCTYPE html><table>${innerHtml}</table>`).window;
 
   const freeCourtCell = document.querySelector(`.${FREE_CELL_CLASS}`);
@@ -62,7 +67,7 @@ function convertHtmlResponse(innerHtml, date) {
 
   const phoneNumbers = freeCourtCell.title.match(PHONE_NUMBER_REGEX);
   const phoneText = `${phoneNumbers.join(', ')}`;
-  const dateText = `Available courts on ${date.format('MMM Do, dd')}:`;
+  const dateText = `Available courts on ${date.format('MMM Do, dd')} in ${courtName}:`;
 
   const availabilityMap = getTableAvailabilityMap(document.querySelector('table'));
   return `
@@ -72,8 +77,9 @@ function convertHtmlResponse(innerHtml, date) {
 }
 
 function getCourtsAvailability(date = moment().add(1, 'days'), clubId = CLUBS.KIEV[0].id, cityId = CITY_IDS.KIEV) {
+  const club = getClubById(clubId);
   return axios.get(generateUrl(date.format(DATE_FORMAT), clubId, cityId))
-    .then(res => convertHtmlResponse(res.data, date));
+    .then(res => convertHtmlResponse(res.data, date, club.name));
 }
 
 module.exports.CLUBS = CLUBS;

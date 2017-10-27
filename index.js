@@ -8,6 +8,14 @@ const { Extra } = Telegraf;
 const BOT_TOKEN = '423197745:AAGrIXXPMJgyiFx8ClFsMmBLPP9oi3h4Qcc';
 const app = new Telegraf(BOT_TOKEN);
 
+function setAppState(newState) {
+  const existingState = app.context.state || {};
+  app.context.state = {
+    ...existingState,
+    ...newState
+  };
+}
+
 app.hears('hi', ctx => ctx.reply('Hey!'));
 
 function getMessageDate(msgDate) {
@@ -26,15 +34,13 @@ app.command('courts', (ctx) => {
   const date = getMessageDate(args[0]);
 
   if (!date) {
-    return ctx.reply(`Invalid date. Please specify week day in 2 letters format (${moment.weekdaysMin().join(', ')})`);
+    const validFormats = `\n${moment.weekdaysMin().join(', ')} \n${moment.weekdaysShort().join(', ')} \n${moment.weekdays().join(', ')}`;
+    return ctx.reply(`Invalid date. Please specify week day in one of the following formats: ${validFormats}`);
   }
 
   const clubName = args[1];
   if (!clubName) {
-    app.action(/.+/, () => {
-      const clubId = CLUBS.KIEV.find(club => club.name === ctx.match[0]).id;
-      return getCourtsAvailability(date, clubId).then(result => ctx.reply(result));
-    });
+    setAppState({ date });
 
     return ctx.reply(
       'Choose a Sport-Life court',
@@ -49,6 +55,11 @@ app.command('courts', (ctx) => {
   }
 
   return getCourtsAvailability(date, club.id).then(result => ctx.reply(result));
+});
+
+app.action(/.+/, (btnCtx) => {
+  const clubId = CLUBS.KIEV.find(club => club.name === btnCtx.match[0]).id;
+  return getCourtsAvailability(btnCtx.state.date, clubId).then(result => btnCtx.reply(result));
 });
 
 app.startPolling();

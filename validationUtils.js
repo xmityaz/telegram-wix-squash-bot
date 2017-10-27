@@ -1,13 +1,19 @@
 const moment = require('moment');
 
-function serializeDate(dateArgument) {
+function getValidDayFormats() {
+  return [...moment.weekdaysMin(), ...moment.weekdaysShort(), ...moment.weekdays()];
+}
+
+function isValidDay(date) {
+  return getValidDayFormats().find(weekDay => weekDay.toLowerCase() === date.toLowerCase());
+}
+
+function serializeDate(date) {
   const result = moment();
-  const isValidWeekDay = moment
-    .weekdaysMin()
-    .find(weekDay => weekDay.toLowerCase() === dateArgument.toLowerCase());
+  const isValidWeekDay = isValidDay(date);
 
   if (isValidWeekDay) {
-    const weekDayDate = moment().day(dateArgument);
+    const weekDayDate = moment().day(date);
     return result > weekDayDate ? weekDayDate.add(7, 'days') : result;
   }
 
