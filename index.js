@@ -6,17 +6,24 @@ const { serializeDate } = require('./validationUtils');
 const { Extra } = Telegraf;
 
 const BOT_TOKEN = '423197745:AAGrIXXPMJgyiFx8ClFsMmBLPP9oi3h4Qcc';
-const app = new Telegraf(BOT_TOKEN);
+
+// Dancing with drum for heroku
+const PORT = process.env.PORT || 3000;
+const URL = process.env.URL || 'https://gentle-falls-94867.herokuapp.com';
+
+const bot = new Telegraf(BOT_TOKEN);
+bot.telegram.setWebhook(`${URL}/bot${BOT_TOKEN}`);
+bot.startWebhook(`/bot${BOT_TOKEN}`, null, PORT);
 
 function setAppState(newState) {
-  const existingState = app.context.state || {};
-  app.context.state = {
+  const existingState = bot.context.state || {};
+  bot.context.state = {
     ...existingState,
     ...newState
   };
 }
 
-app.hears('hi', ctx => ctx.reply('Hey!'));
+bot.hears('hi', ctx => ctx.reply('Hey!'));
 
 function getMessageDate(msgDate) {
   if (!msgDate) {
@@ -29,7 +36,7 @@ function serializeClubName(clubName) {
   return CLUBS.KIEV.find(club => club.name.toLowerCase() === clubName.toLowerCase());
 }
 
-app.command('help', (ctx) => {
+bot.command('help', (ctx) => {
   ctx.reply(`
 To check courts availability type '/courts day club'
 
@@ -39,7 +46,7 @@ day" - day name on nearest week. In one of the format: "mo", "mon", "monday". If
   `);
 });
 
-app.command('courts', (ctx) => {
+bot.command('courts', (ctx) => {
   const args = ctx.message.text.split(' ').slice(1);
   const date = getMessageDate(args[0]);
 
@@ -67,9 +74,9 @@ app.command('courts', (ctx) => {
   return getCourtsAvailability(date, club.id).then(result => ctx.reply(result));
 });
 
-app.action(/.+/, (btnCtx) => {
+bot.action(/.+/, (btnCtx) => {
   const clubId = CLUBS.KIEV.find(club => club.name === btnCtx.match[0]).id;
   return getCourtsAvailability(btnCtx.state.date, clubId).then(result => btnCtx.reply(result));
 });
 
-app.startPolling();
+bot.startPolling();
