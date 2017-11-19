@@ -5,16 +5,16 @@ function getValidDayFormats() {
 }
 
 function isValidDay(date) {
-  return getValidDayFormats().find(weekDay => weekDay.toLowerCase() === date.toLowerCase());
+  return getValidDayFormats().some(weekDay => weekDay.toLowerCase() === date.toLowerCase());
 }
 
 function serializeDate(date) {
-  const result = moment();
+  const today = moment();
   const isValidWeekDay = isValidDay(date);
 
   if (isValidWeekDay) {
     const weekDayDate = moment().day(date);
-    return result > weekDayDate ? weekDayDate.add(7, 'days') : result;
+    return today > weekDayDate ? weekDayDate.add(7, 'days') : weekDayDate;
   }
 
   return null;

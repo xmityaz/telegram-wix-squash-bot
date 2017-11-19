@@ -27,7 +27,6 @@ function generateUrl(date, clubId, cityId) {
   return `${SPORT_LIFE_TABLE_URL}?city_id=${cityId}&club_id=${clubId}&date_selected=${date}`;
 }
 
-const PHONE_NUMBER_REGEX = /\d{3}[- ]?\d{3}-\d{2}-\d{2}/g;
 
 const FIRST_AVAILABLE_HOUR = 7;
 const FREE_CELL_CLASS = 'courts-table__free';
@@ -56,29 +55,34 @@ function printAvailabilityTable(availabilityMap) {
   }, '');
 }
 
+function getPhoneNumbersFromText(cellText) {
+  const PHONE_NUMBER_REGEX = /\d{3}[- ]?\d{3}-\d{2}-\d{2}/g;
+  const phoneNumbers = cellText.match(PHONE_NUMBER_REGEX);
+  return `${phoneNumbers.join(', ')}`;
+}
+
 function convertHtmlResponse(innerHtml, date, courtName) {
   const { document } = new JSDOM(`<!DOCTYPE html><table>${innerHtml}</table>`).window;
-
   const freeCourtCell = document.querySelector(`.${FREE_CELL_CLASS}`);
 
   if (!freeCourtCell) {
     return 'No available courst for this day';
   }
 
-  const phoneNumbers = freeCourtCell.title.match(PHONE_NUMBER_REGEX);
-  const phoneText = `${phoneNumbers.join(', ')}`;
+  const phoneNumbers = getPhoneNumbersFromText(freeCourtCell.title);
   const dateText = `Available courts on ${date.format('MMM Do, dd')} in ${courtName}:`;
-
   const availabilityMap = getTableAvailabilityMap(document.querySelector('table'));
+
   return `
     ${dateText}
     ${printAvailabilityTable(availabilityMap)}
-    ${phoneText}`;
+    ${phoneNumbers}`;
 }
 
 function getCourtsAvailability(date = moment().add(1, 'days'), clubId = CLUBS.KIEV[0].id, cityId = CITY_IDS.KIEV) {
   const club = getClubById(clubId);
-  return axios.get(generateUrl(date.format(DATE_FORMAT), clubId, cityId))
+  return axios
+    .get(generateUrl(date.format(DATE_FORMAT), clubId, cityId))
     .then(res => convertHtmlResponse(res.data, date, club.name));
 }
 

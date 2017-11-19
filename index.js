@@ -29,6 +29,16 @@ function serializeClubName(clubName) {
   return CLUBS.KIEV.find(club => club.name.toLowerCase() === clubName.toLowerCase());
 }
 
+app.command('help', (ctx) => {
+  ctx.reply(`
+To check courts availability type '/courts day club'
+
+Where "day" and "club" are optional arguments.
+day" - day name on nearest week. In one of the format: "mo", "mon", "monday". If you don't specify this parameter it will set to today.
+"club" - sportlife club name. Just omit this parameter for the first time to check the abailable club names
+  `);
+});
+
 app.command('courts', (ctx) => {
   const args = ctx.message.text.split(' ').slice(1);
   const date = getMessageDate(args[0]);
