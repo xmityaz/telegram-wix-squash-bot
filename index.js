@@ -11,7 +11,7 @@ const BOT_TOKEN = '423197745:AAGrIXXPMJgyiFx8ClFsMmBLPP9oi3h4Qcc';
 // Dancing with drum for heroku
 const expressApp = express();
 const PORT = process.env.PORT || 3000;
-const URL = process.env.URL || 'https://gentle-falls-94867.herokuapp.com';
+const URL = process.env.URL || 'https://serene-brushlands-80914.herokuapp.com';
 
 const bot = new Telegraf(BOT_TOKEN);
 bot.telegram.setWebhook(`${URL}/bot${BOT_TOKEN}`);
