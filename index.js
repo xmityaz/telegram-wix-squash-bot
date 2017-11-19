@@ -1,5 +1,6 @@
 const Telegraf = require('telegraf');
 const moment = require('moment');
+const express = require('express');
 const { CLUBS, getCourtsAvailability } = require('./sport-life-squash');
 const { serializeDate } = require('./validationUtils');
 
@@ -8,12 +9,20 @@ const { Extra } = Telegraf;
 const BOT_TOKEN = '423197745:AAGrIXXPMJgyiFx8ClFsMmBLPP9oi3h4Qcc';
 
 // Dancing with drum for heroku
+const expressApp = express();
 const PORT = process.env.PORT || 3000;
 const URL = process.env.URL || 'https://gentle-falls-94867.herokuapp.com';
 
 const bot = new Telegraf(BOT_TOKEN);
 bot.telegram.setWebhook(`${URL}/bot${BOT_TOKEN}`);
-bot.startWebhook(`/bot${BOT_TOKEN}`, null, PORT);
+expressApp.use(bot.webhookCallback(`/bot${BOT_TOKEN}`));
+
+expressApp.get('/', (req, res) => {
+  res.send('Hello World!');
+});
+expressApp.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 function setAppState(newState) {
   const existingState = bot.context.state || {};
